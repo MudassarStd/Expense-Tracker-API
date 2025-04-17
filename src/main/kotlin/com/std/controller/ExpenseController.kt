@@ -1,26 +1,75 @@
 package com.std.controller
 
+import com.std.dto.ExpenseRequest
 import com.std.model.Category
 import com.std.model.Expense
+import com.std.model.Type
 import com.std.model.User
 import com.std.service.ExpenseService
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-
+import java.time.LocalDate
+import kotlin.math.exp
 
 @RestController
 @RequestMapping("/expense")
 class ExpenseController(private val expenseService: ExpenseService) {
 
+    @GetMapping("find/{id}")
+    fun findById(
+        @PathVariable(required = true) id: Long
+    ) = expenseService.findById(id)
+
     @GetMapping
-    fun getAll() = expenseService.findAll()
+    fun getAll(
+        @RequestParam(required = false) minAmount: Double?,
+        @RequestParam(required = false) maxAmount: Double?,
+        @RequestParam(required = false) category: Category?,
+        @RequestParam(required = false) type: Type?,
+        @RequestParam(required = false) startDate: LocalDate?,
+        @RequestParam(required = false) endDate: LocalDate?
+
+    ) = expenseService.findAllFiltered(minAmount, maxAmount, category, type, startDate, endDate)
 
     @PostMapping
-    fun add() = expenseService.add(Expense(
-        amount = 12.0,
-        description = "this",
-        category = Category.HEALTH,
-    ))
+    fun add(
+        @RequestBody(required = true) expenseRequest: ExpenseRequest
+    ) = expenseService.add(expenseRequest)
+
+    @PostMapping("/list")
+    fun addList(
+        @RequestBody(required = true) list: List<ExpenseRequest>
+    ) = expenseService.addList(list)
+
+    @PutMapping("/update/{id}")
+    fun update(
+        @PathVariable(required = true) id: Long,
+        @RequestBody(required = true) expense: Expense
+    ) = expenseService.update(id, expense)
+
+    @DeleteMapping("/delete/{id}")
+    fun delete(
+        @PathVariable(required = true) id: Long
+    ) = expenseService.deleteById(id)
+
+    // can be filtered by date
+    @GetMapping("/total")
+    fun getTotalAmount(
+        @RequestParam startDate: LocalDate?,
+        @RequestParam endDate: LocalDate?
+    ) = expenseService.getTotalAmount(startDate, endDate)
+
+    @GetMapping("/total/type/{type}")
+    fun getTotalAmountByType(
+        @PathVariable(required = true) type: Type,
+    ) = expenseService.getTotalAmountByType(type)
 }

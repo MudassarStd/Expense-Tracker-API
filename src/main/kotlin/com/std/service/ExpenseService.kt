@@ -1,12 +1,71 @@
 package com.std.service
 
+import com.std.dto.ExpenseRequest
+import com.std.mapper.toExpense
+import com.std.model.Category
 import com.std.model.Expense
+import com.std.model.Type
 import com.std.repository.ExpenseRepository
+import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 import kotlin.math.exp
+import kotlin.math.min
 
 @Service
 class ExpenseService(private val expenseRepository: ExpenseRepository) {
+
     fun findAll() = expenseRepository.findAll()
-    fun add(expense: Expense) = expenseRepository.save(expense)
+
+    fun findById(id: Long) = expenseRepository.findById(id)
+
+    fun add(expenseRequest: ExpenseRequest) = expenseRepository.save(expenseRequest.toExpense())
+
+    fun addList(list: List<ExpenseRequest>) {
+        val expenses = list.map { it.toExpense() }
+        expenseRepository.saveAll(expenses)
+    }
+
+
+    fun findAllFiltered(
+        minAmount: Double?,
+        maxAmount: Double?,
+        category: Category?,
+        type: Type?,
+        startDate: LocalDate?,
+        endDate: LocalDate?
+    ): List<Expense> {
+        return expenseRepository.findAll().filter { expense ->
+            (minAmount == null || expense.amount >= minAmount) &&
+                    (maxAmount == null || expense.amount <= maxAmount) &&
+                    (category == null || expense.category == category) &&
+                    (type == null || expense.type == type) && (startDate == null || expense.date >= startDate) && (endDate == null || expense.date <= endDate)
+        }
+    }
+
+    fun update(id: Long, expense: Expense): Expense? {
+        return if (expenseRepository.existsById(id)) {
+            expenseRepository.save(expense.copy(id = id))
+        } else {
+            null
+        }
+    }
+
+    fun deleteById(id: Long): String {
+        return if (expenseRepository.existsById(id)) {
+            expenseRepository.deleteById(id)
+            "Deleted successfully"
+        } else {
+            "Expense does not exist"
+        }
+    }
+
+    fun getTotalAmount(
+        startDate: LocalDate?,
+        endDate: LocalDate?
+    ) = expenseRepository.findAll()
+        .filter { (startDate == null || it.date >= startDate) && (endDate == null || it.date <= endDate) }
+
+    fun getTotalAmountByType(type: Type) = expenseRepository.findAll().filter { it.type == type }.sumOf { it.amount }
+
 }

@@ -1,6 +1,7 @@
 package com.std.model
 
 import jakarta.persistence.*
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 @Entity
@@ -11,6 +12,9 @@ data class Expense(
     val description: String,
     @Enumerated(EnumType.STRING)
     val category: Category,
+    @Enumerated(EnumType.STRING)
+    val type: Type,
+    val date: LocalDate = LocalDate.now()
 
     // Understand below code
 
@@ -19,12 +23,13 @@ data class Expense(
 //    val user: User
 )
 
+enum class Type { EXPENSE, INCOME }
+
 enum class Category {
-    GROCERIES,
-    LEISURE,
-    ELECTRONICS,
+    FOOD,
+    TRAVEL,
     UTILITIES,
-    CLOTHING,
     HEALTH,
+    ENTERTAINMENT,
     OTHERS
 }

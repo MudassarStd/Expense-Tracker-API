@@ -1,5 +1,0 @@
-JWT-Service { handles token creation, validation }
-Auth-Service { handles registration, login and token-service calls }
-
-Auth-Controller { exposes auth endpoints to client }
-

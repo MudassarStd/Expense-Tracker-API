@@ -12,7 +12,6 @@ import javax.crypto.SecretKey
 // ******* UnderStand JWT and this service ************
 // *************************************
 
-
 @Service
 class JwtService {
 
