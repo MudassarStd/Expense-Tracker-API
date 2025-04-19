@@ -61,15 +61,21 @@ class ExpenseController(private val expenseService: ExpenseService) {
         @PathVariable(required = true) id: Long
     ) = expenseService.deleteById(id)
 
-    // can be filtered by date
     @GetMapping("/total")
     fun getTotalAmount(
         @RequestParam startDate: LocalDate?,
         @RequestParam endDate: LocalDate?
     ) = expenseService.getTotalAmount(startDate, endDate)
 
-    @GetMapping("/total/type/{type}")
+    @GetMapping("/total/type")
     fun getTotalAmountByType(
-        @PathVariable(required = true) type: Type,
+        @RequestParam(required = true) type: Type,
     ) = expenseService.getTotalAmountByType(type)
+
+    @RequestMapping("get/sorted")
+    fun getAllSorted(
+        @RequestParam(required = false) order: Sort?
+    ) = expenseService.findSortedByOrder(order)
 }
+
+enum class Sort { ASC, DEC }

@@ -1,5 +1,6 @@
 package com.std.service
 
+import com.std.controller.Sort
 import com.std.dto.ExpenseRequest
 import com.std.mapper.toExpense
 import com.std.model.Category
@@ -9,6 +10,7 @@ import com.std.repository.ExpenseRepository
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import java.time.LocalDate
+import javax.swing.SortOrder
 import kotlin.math.exp
 import kotlin.math.min
 
@@ -25,7 +27,6 @@ class ExpenseService(private val expenseRepository: ExpenseRepository) {
         val expenses = list.map { it.toExpense() }
         expenseRepository.saveAll(expenses)
     }
-
 
     fun findAllFiltered(
         minAmount: Double?,
@@ -64,8 +65,15 @@ class ExpenseService(private val expenseRepository: ExpenseRepository) {
         startDate: LocalDate?,
         endDate: LocalDate?
     ) = expenseRepository.findAll()
-        .filter { (startDate == null || it.date >= startDate) && (endDate == null || it.date <= endDate) }
+        .filter { (startDate == null || it.date >= startDate) && (endDate == null || it.date <= endDate) }.sumOf { it.amount }
 
     fun getTotalAmountByType(type: Type) = expenseRepository.findAll().filter { it.type == type }.sumOf { it.amount }
 
+    fun findSortedByOrder(order: Sort?): List<Expense> {
+        return if (order == Sort.ASC || order == null) {
+            expenseRepository.findAll().sortedBy { it.date }
+        } else {
+            expenseRepository.findAll().sortedByDescending { it.date }
+        }
+    }
 }
