@@ -97,6 +97,7 @@ src/
 │   │           ├── repository/    # Data access layer
 │   │           ├── dto/          # Data Transfer Objects
 │   │           ├── mapper/       # Object mappers
+│   │           ├── exception/     # Exception handlers 
 │   ├── resources/
 │   │   ├── static/              # Static files (CSS, JS, images)
 │   │   └── templates/           # HTML templates
