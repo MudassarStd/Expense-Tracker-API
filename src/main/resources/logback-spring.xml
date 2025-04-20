@@ -1,0 +1,35 @@
+<configuration>
+
+
+<!--    Log Appender config -->
+<!--    Appender appends logs to output station { file or console }-->
+    <appender name = "CONSOLE" class  = "ch.qos.logback.core.ConsoleAppender" >
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%level] %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+
+        <file> logs/app.log </file> <!-- File path -->
+        <append> true </append>
+
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%level] %logger{36} - %msg%n</pattern>
+        </encoder>
+
+    </appender>
+
+<!--    Loggers configuration -->
+<!--    Filtering loggers -->
+<!--    Controller will be logged to console while root will stay in file-->
+    <logger name = "com.std.service.ExpenseService" level = "DEBUG">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+
+    <!--    root: all loggers at app level will be appended to file && console (disabled)-->
+    <root>
+        <appender-ref ref = "FILE" />
+<!--        <appender-ref ref="CONSOLE"/>-->
+    </root>
+</configuration>

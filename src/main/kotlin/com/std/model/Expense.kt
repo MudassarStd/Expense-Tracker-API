@@ -24,7 +24,6 @@ data class Expense(
 )
 
 enum class Type { EXPENSE, INCOME }
-
 enum class Category {
     FOOD,
     TRAVEL,
