@@ -1,8 +1,8 @@
 package com.std.model
 
 import jakarta.persistence.*
+import jakarta.validation.constraints.Positive
 import java.time.LocalDate
-import java.time.LocalDateTime
 
 @Entity
 data class Expense(
@@ -15,8 +15,6 @@ data class Expense(
     @Enumerated(EnumType.STRING)
     val type: Type,
     val date: LocalDate = LocalDate.now()
-
-    // Understand below code
 
 //    @ManyToOne(fetch = FetchType.LAZY)
 //    @JoinColumn(name = "user_id", nullable = false)

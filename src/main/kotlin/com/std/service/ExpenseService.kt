@@ -10,20 +10,13 @@ import com.std.model.Expense
 import com.std.model.Type
 import com.std.repository.ExpenseRepository
 import org.slf4j.LoggerFactory
-import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import java.time.LocalDate
-import java.util.logging.Logger
-import javax.swing.SortOrder
-import kotlin.math.exp
-import kotlin.math.log
-import kotlin.math.min
 
 @Service
 class ExpenseService(private val expenseRepository: ExpenseRepository) {
 
-    private val logger =
-        LoggerFactory.getLogger(ExpenseService::class.java) // representing KClass, then converting to Java
+    private val logger = LoggerFactory.getLogger(ExpenseService::class.java) // representing KClass, then converting to Java
     
     fun findById(id: Long): Expense =
         expenseRepository.findById(id).orElseThrow { ResourceNotFoundException("No expense found for id $id") }
@@ -87,9 +80,9 @@ class ExpenseService(private val expenseRepository: ExpenseRepository) {
     fun getTotalAmount(
         startDate: LocalDate?,
         endDate: LocalDate?
-    ) {
+    ): Double {
         logger.info("Date params from request, startDate: $startDate && endDate: $endDate")
-        expenseRepository.findAll()
+        return expenseRepository.findAll()
             .filter { (startDate == null || it.date >= startDate) && (endDate == null || it.date <= endDate) }
             .sumOf { it.amount }
     }
