@@ -8,6 +8,7 @@ import java.time.LocalDate
 data class Expense(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
+    @field:Positive // amount should be positive
     val amount: Double,
     val description: String,
     @Enumerated(EnumType.STRING)

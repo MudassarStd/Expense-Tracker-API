@@ -1,16 +1,23 @@
-let editingId = null;
+<script>
+let currentPage = 0;
+const pageSize = 5;
 
 function toggleFilters() {
   document.getElementById('filterForm').classList.toggle('active');
 }
 
 async function fetchExpenses(params = '') {
-  const res = await fetch('/expense' + params);
+  const fullParams = new URLSearchParams(params);
+  fullParams.set('page', currentPage);
+  fullParams.set('pageSize', pageSize);
+
+  const res = await fetch('/expense?' + fullParams.toString());
   const data = await res.json();
 
-  const container = document.getElementById('expenses');
-  container.innerHTML = '';
-  data.forEach(exp => {
+  const expensesTable = document.getElementById('expenses');
+  expensesTable.innerHTML = '';
+
+  data.expenses.forEach(exp => {
     const row = document.createElement('tr');
     row.innerHTML = `
       <td class="expense-amount ${exp.type === 'EXPENSE' ? 'type-expense' : 'type-income'}">Rs.${exp.amount}</td>
@@ -23,28 +30,36 @@ async function fetchExpenses(params = '') {
         <i class="fas fa-trash" title="Delete" onclick="deleteExpense(${exp.id})"></i>
       </td>
     `;
-    container.appendChild(row);
+    expensesTable.appendChild(row);
   });
+
+  // Fix pagination button logic
+  document.getElementById('prevPage').disabled = currentPage === 0;
+  document.getElementById('nextPage').disabled = !data.hasNextPage;
+
+  // Optional: update page indicator
+  document.getElementById('pageInfo').textContent = `Page ${currentPage + 1}`;
 }
+
 
 async function fetchTotalAmount() {
   const res = await fetch('/expense/total');
-  const totalAmount = await res.json();
-  document.getElementById('totalAmountCard').querySelector('p').textContent = `Rs.${totalAmount}`;
+  const total = await res.json();
+  document.getElementById('totalAmountCard').querySelector('p').textContent = `Rs.${total}`;
 
-  const resIncome = await fetch('/expense/total/type?type=INCOME');
-  const totalIncome = await resIncome.json();
-  document.getElementById('totalIncomeCard').querySelector('p').textContent = `Rs.${totalIncome}`;
+  const incomeRes = await fetch('/expense/total/type?type=INCOME');
+  const income = await incomeRes.json();
+  document.getElementById('totalIncomeCard').querySelector('p').textContent = `Rs.${income}`;
 
-  const resExpense = await fetch('/expense/total/type?type=EXPENSE');
-  const totalExpense = await resExpense.json();
-  document.getElementById('totalExpenseCard').querySelector('p').textContent = `Rs.${totalExpense}`;
+  const expenseRes = await fetch('/expense/total/type?type=EXPENSE');
+  const expense = await expenseRes.json();
+  document.getElementById('totalExpenseCard').querySelector('p').textContent = `Rs.${expense}`;
 }
 
 document.getElementById('expenseForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   const formData = new FormData(e.target);
-  const data = Object.fromEntries(formData);
+  const data = Object.fromEntries(formData.entries());
 
   data.amount = parseFloat(data.amount);
   data.date = new Date(data.date).toISOString().split('T')[0];
@@ -60,30 +75,35 @@ document.getElementById('expenseForm').addEventListener('submit', async (e) => {
 
   editingId = null;
   e.target.reset();
-  fetchExpenses();
+  fetchExpenses(lastFilterParams);
   fetchTotalAmount();
 });
 
-document.getElementById('filterForm').addEventListener('submit', async (e) => {
+let lastFilterParams = new URLSearchParams();
+
+document.getElementById('filterForm').addEventListener('submit', (e) => {
   e.preventDefault();
   const formData = new FormData(e.target);
   const params = new URLSearchParams();
   for (const [key, value] of formData.entries()) {
     if (value) params.append(key, value);
   }
-  fetchExpenses('?' + params.toString());
+  lastFilterParams = params;
+  currentPage = 0;
+  fetchExpenses(params);
 });
 
-async function deleteExpense(id) {
-  if (!confirm("Are you sure you want to delete this expense?")) return;
+document.getElementById('prevPage').addEventListener('click', () => {
+  if (currentPage > 0) {
+    currentPage--;
+    fetchExpenses(lastFilterParams);
+  }
+});
 
-  await fetch(`/expense/delete/${id}`, {
-    method: 'DELETE'
-  });
-
-  fetchExpenses();
-  fetchTotalAmount();
-}
+document.getElementById('nextPage').addEventListener('click', () => {
+  currentPage++;
+  fetchExpenses(lastFilterParams);
+});
 
 function editExpense(id) {
   fetch(`/expense/find/${id}`)
@@ -99,6 +119,14 @@ function editExpense(id) {
     });
 }
 
+async function deleteExpense(id) {
+  if (!confirm("Are you sure you want to delete this expense?")) return;
+  await fetch(`/expense/delete/${id}`, { method: 'DELETE' });
+  fetchExpenses(lastFilterParams);
+  fetchTotalAmount();
+}
+
 // Initial load
 fetchExpenses();
 fetchTotalAmount();
+</script>

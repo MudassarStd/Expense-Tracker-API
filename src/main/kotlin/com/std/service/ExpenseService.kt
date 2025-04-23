@@ -2,6 +2,7 @@ package com.std.service
 
 import com.std.controller.Sort
 import com.std.dto.ExpenseRequest
+import com.std.dto.PaginatedResponse
 import com.std.exception.InvalidRequestException
 import com.std.exception.ResourceNotFoundException
 import com.std.mapper.toExpense
@@ -10,8 +11,13 @@ import com.std.model.Expense
 import com.std.model.Type
 import com.std.repository.ExpenseRepository
 import org.slf4j.LoggerFactory
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Pageable
+import org.springframework.data.util.Streamable
 import org.springframework.stereotype.Service
 import java.time.LocalDate
+import kotlin.math.exp
 
 @Service
 class ExpenseService(private val expenseRepository: ExpenseRepository) {
@@ -44,14 +50,25 @@ class ExpenseService(private val expenseRepository: ExpenseRepository) {
         category: Category?,
         type: Type?,
         startDate: LocalDate?,
-        endDate: LocalDate?
-    ): List<Expense> {
-        return expenseRepository.findAll().filter { expense ->
+        endDate: LocalDate?,
+        page: Int,
+        pageSize: Int
+    ): PaginatedResponse {
+
+        val pageRequest = PageRequest.of(page, pageSize)
+        val pageResult: Page<Expense> = expenseRepository.findAll(pageRequest)
+
+        val filteredExpenses = pageResult.content.filter { expense ->
             (minAmount == null || expense.amount >= minAmount) &&
                     (maxAmount == null || expense.amount <= maxAmount) &&
                     (category == null || expense.category == category) &&
                     (type == null || expense.type == type) && (startDate == null || expense.date >= startDate) && (endDate == null || expense.date <= endDate)
         }
+
+        return PaginatedResponse(
+            expenses = filteredExpenses,
+            hasNextPage = pageResult.hasNext()
+        )
     }
 
     fun update(id: Long, expense: Expense): Expense {

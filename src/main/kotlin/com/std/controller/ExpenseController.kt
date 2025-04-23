@@ -7,6 +7,7 @@ import com.std.model.Expense
 import com.std.model.Type
 import com.std.model.User
 import com.std.service.ExpenseService
+import jakarta.validation.Valid
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -44,13 +45,15 @@ class ExpenseController(private val expenseService: ExpenseService) {
         @RequestParam(required = false) category: Category?,
         @RequestParam(required = false) type: Type?,
         @RequestParam(required = false) startDate: LocalDate?,
-        @RequestParam(required = false) endDate: LocalDate?
+        @RequestParam(required = false) endDate: LocalDate?,
+        @RequestParam(defaultValue = "0") page: Int,
+        @RequestParam(defaultValue = "5") pageSize: Int,
 
-    ) = expenseService.findAllFiltered(minAmount, maxAmount, category, type, startDate, endDate)
+    ) = expenseService.findAllFiltered(minAmount, maxAmount, category, type, startDate, endDate, page, pageSize)
 
     @PostMapping
     fun add(
-        @RequestBody(required = true) expenseRequest: ExpenseRequest
+        @Valid @RequestBody(required = true) expenseRequest: ExpenseRequest
     ) = expenseService.add(expenseRequest)
 
     @PostMapping("/list")

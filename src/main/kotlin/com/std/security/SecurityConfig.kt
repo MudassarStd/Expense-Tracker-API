@@ -1,7 +1,5 @@
 package com.std.security
 
-import com.std.util.UserRole
-import org.apache.catalina.webresources.TomcatURLStreamHandlerFactory.disable
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -16,7 +14,6 @@ import org.springframework.security.web.SecurityFilterChain
 @Configuration
 @EnableWebSecurity
 class SecurityConfig {
-
     private val logger = LoggerFactory.getLogger(SecurityConfig::class.java)
 
     @Bean
@@ -36,7 +33,7 @@ class SecurityConfig {
     @Bean
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
         http
-            .csrf { disable() }
+            .csrf { it.disable() }
             .authorizeHttpRequests {
                 it.anyRequest().authenticated()
             }
