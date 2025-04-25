@@ -15,11 +15,11 @@ data class Expense(
     val category: Category,
     @Enumerated(EnumType.STRING)
     val type: Type,
-    val date: LocalDate = LocalDate.now()
+    val date: LocalDate = LocalDate.now(),
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "user_id", nullable = false)
-//    val user: User
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "uid", nullable = false)
+    val user: User
 )
 
 enum class Type { EXPENSE, INCOME }

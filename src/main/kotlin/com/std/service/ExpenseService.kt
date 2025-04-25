@@ -9,12 +9,15 @@ import com.std.mapper.toExpense
 import com.std.model.Category
 import com.std.model.Expense
 import com.std.model.Type
+import com.std.model.User
 import com.std.repository.ExpenseRepository
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.util.Streamable
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import kotlin.math.exp
@@ -29,7 +32,7 @@ class ExpenseService(private val expenseRepository: ExpenseRepository) {
 
     fun add(expenseRequest: ExpenseRequest) {
         if (expenseRequest.amount <= 0) throw InvalidRequestException("Expense amount cannot be zero or less")
-        expenseRepository.save(expenseRequest.toExpense())
+        expenseRepository.save(expenseRequest.toExpense(getCurrentAuthenticatedUser()))
     }
 
     fun addList(list: List<ExpenseRequest>) {
@@ -40,7 +43,7 @@ class ExpenseService(private val expenseRepository: ExpenseRepository) {
             if (expense.amount <= 0) throw InvalidRequestException("Expense amount is zero or less at list index $i")
         }
 
-        val expenses = list.map { it.toExpense() }
+        val expenses = list.map { it.toExpense(getCurrentAuthenticatedUser()) }
         expenseRepository.saveAll(expenses)
     }
 
@@ -113,4 +116,10 @@ class ExpenseService(private val expenseRepository: ExpenseRepository) {
             expenseRepository.findAll().sortedByDescending { it.date }
         }
     }
+
+
+    private fun getCurrentAuthenticatedUser(): User {
+        return SecurityContextHolder.getContext().authentication.principal as User
+    }
+
 }

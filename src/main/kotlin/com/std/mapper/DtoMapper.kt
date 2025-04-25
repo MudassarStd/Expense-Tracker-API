@@ -11,10 +11,11 @@ fun RegisterRequest.toUser(hashedPassword: String) = User(
     password = hashedPassword
 )
 
-fun ExpenseRequest.toExpense() = Expense (
+fun ExpenseRequest.toExpense(user: User) = Expense (
     amount = this.amount,
     category = this.category,
     type = this.type,
     description = this.description,
-    date = this.date
+    date = this.date,
+    user = user
 )

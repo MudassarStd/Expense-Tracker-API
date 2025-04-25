@@ -1,55 +1,42 @@
-//package com.std.service
-//
-//import com.std.dto.AuthResponse
-//import com.std.dto.LoginRequest
-//import com.std.dto.RegisterRequest
-//import com.std.mapper.toUser
-//import org.springframework.context.annotation.Bean
-//import org.springframework.security.authentication.BadCredentialsException
-//import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
-//import org.springframework.security.crypto.password.PasswordEncoder
-//import org.springframework.stereotype.Service
-//import kotlin.math.log
-//
-//@Service
-//class AuthService(
-//    private val userService: UserService,
-//    private val jwtService: JwtService,
-//    private val passwordEncoder: BCryptPasswordEncoder
-//) {
-//
-//    fun register(registerRequest: RegisterRequest): AuthResponse {
-//        // if email is already registered
-//        if (userService.existsByEmail(registerRequest.email)) {
-//            throw IllegalArgumentException("Email is already in use")
-//        }
-//        val hashedPassword = passwordEncoder.encode(registerRequest.password)
-//
-//        // create a user from register request
-//        val newUser = registerRequest.toUser(hashedPassword)
-//
-//        // save user
-//        userService.save(newUser)
-//
-//        // generate token
-//        val token = jwtService.generateToken(newUser.email)
-//
-//        // response with token
-//        return AuthResponse(token)
-//    }
-//    fun login(loginRequest: LoginRequest): AuthResponse {
-//
-//        // find user
-//        val user = userService.findByEmail(loginRequest.email)
-//
-//        // validate password
-//        if (!passwordEncoder.matches(loginRequest.password, user.password)) {
-//            throw BadCredentialsException("Invalid password")
-//        }
-//
-//
-//        val token = jwtService.generateToken(user.email)
-//
-//        return AuthResponse(token)
-//    }
-//}
+package com.std.service
+
+import com.std.dto.AuthResponse
+import com.std.dto.LoginRequest
+import com.std.dto.RegisterRequest
+import com.std.mapper.toUser
+import com.std.repository.UserRepository
+import org.slf4j.LoggerFactory
+import org.springframework.security.authentication.AuthenticationManager
+import org.springframework.security.authentication.AuthenticationServiceException
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import org.springframework.stereotype.Service
+
+
+@Service
+class AuthService(
+    private val userRepository: UserRepository,
+    private val bCryptPasswordEncoder: BCryptPasswordEncoder,
+    private val jwtService: JwtService,
+    private val authenticationManager: AuthenticationManager
+) {
+
+    val logger = LoggerFactory.getLogger(AuthService::class.java)
+
+    fun register(request: RegisterRequest): AuthResponse {
+        logger.info("In register")
+        userRepository.save(request.toUser(bCryptPasswordEncoder.encode(request.password)))
+        logger.info("after saving user")
+        return AuthResponse(token = jwtService.generateToken(request.email))
+    }
+
+    fun authenticate(request: LoginRequest): AuthResponse {
+
+        val authToken = UsernamePasswordAuthenticationToken(request.email, request.password)
+
+        authenticationManager.authenticate(authToken)
+
+        return AuthResponse(token = jwtService.generateToken(request.email))
+    }
+
+}
