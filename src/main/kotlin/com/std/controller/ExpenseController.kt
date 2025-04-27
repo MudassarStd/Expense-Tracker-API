@@ -1,6 +1,7 @@
 package com.std.controller
 
 import com.std.dto.ExpenseRequest
+import com.std.dto.ExpenseResponse
 import com.std.exception.InvalidRequestException
 import com.std.model.Category
 import com.std.model.Expense
@@ -33,10 +34,7 @@ class ExpenseController(private val expenseService: ExpenseService) {
     @GetMapping("find/{id}")
     fun findById(
         @PathVariable(required = true) id: Long
-    ) {
-        logger.info("Expense Id on findById: $id")
-        expenseService.findById(id)
-    }
+    ): ExpenseResponse = expenseService.findById(id)
 
     @GetMapping
     fun getAll(
@@ -64,11 +62,11 @@ class ExpenseController(private val expenseService: ExpenseService) {
         expenseService.addList(list)
     }
 
-    @PutMapping("/update/{id}")
-    fun update(
-        @PathVariable(required = true) id: Long,
-        @RequestBody(required = true) expense: Expense
-    ) = expenseService.update(id, expense)
+//    @PutMapping("/update/{id}")
+//    fun update(
+//        @PathVariable(required = true) id: Long,
+//        @RequestBody(required = true) expense: Expense
+//    ) = expenseService.update(id, expense)
 
     @DeleteMapping("/delete/{id}")
     fun delete(

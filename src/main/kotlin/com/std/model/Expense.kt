@@ -16,8 +16,7 @@ data class Expense(
     @Enumerated(EnumType.STRING)
     val type: Type,
     val date: LocalDate = LocalDate.now(),
-
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "uid", nullable = false)
     val user: User
 )

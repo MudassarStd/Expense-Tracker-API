@@ -21,17 +21,6 @@ class SecurityConfig (
 ) {
     private val logger = LoggerFactory.getLogger(SecurityConfig::class.java)
 
-//    @Bean
-//    fun userDetailsService(): UserDetailsService {
-//        val user = User.withUsername("user")
-//            .password(bCryptPasswordEncoder.encode("123456"))
-////            .roles(UserRole.USER.toString())
-//            .build()
-//
-//        logger.info("User created: $user")
-//        return InMemoryUserDetailsManager(user)
-//    }
-
     @Bean
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
         return http

@@ -21,6 +21,12 @@ h1, h2 {
   margin-top: 2rem;
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-section:hover, .expenses-section:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 25px rgba(0,0,0,0.1);
 }
 
 .filter-section {
@@ -40,6 +46,12 @@ h1, h2 {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.filter-toggle:hover {
+  background: #34495e;
+  transform: translateY(-2px);
 }
 
 .filter-form {
@@ -49,9 +61,21 @@ h1, h2 {
   margin-top: 1rem;
   justify-content: flex-start;
   background: #fff;
-  padding: 1rem;
+  padding: 1.5rem;
   border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .filter-form.active {
@@ -59,13 +83,19 @@ h1, h2 {
 }
 
 .chip {
-  border: 1px solid #ccc;
+  border: 1px solid #dee2e6;
   border-radius: 20px;
   padding: 0.4rem 1rem;
-  background: #f9f9f9;
+  background: #f8f9fa;
   display: flex;
   align-items: center;
   gap: 0.4rem;
+  transition: all 0.3s ease;
+}
+
+.chip:hover {
+  background: #e9ecef;
+  transform: translateY(-1px);
 }
 
 .chip input, .chip select {
@@ -73,6 +103,11 @@ h1, h2 {
   outline: none;
   font-size: 0.9rem;
   background: transparent;
+  transition: all 0.3s ease;
+}
+
+.chip input:focus, .chip select:focus {
+  color: #3498db;
 }
 
 form {
@@ -84,26 +119,45 @@ form {
 
 input, select, button {
   padding: 0.7rem;
-  border: 1px solid #ccc;
+  border: 1px solid #dee2e6;
   border-radius: 8px;
   font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
 }
 
 button {
   background: #2c3e50;
   color: #fff;
   cursor: pointer;
-  transition: background 0.3s;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
 button:hover {
   background: #34495e;
+  transform: translateY(-2px);
+}
+
+button:active {
+  transform: translateY(0);
 }
 
 .expenses-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   margin-top: 1rem;
+  border-radius: 8px;
+  overflow: hidden;
 }
 
 .expenses-table th {
@@ -111,72 +165,102 @@ button:hover {
   color: white;
   padding: 1rem;
   text-align: left;
+  font-weight: 600;
 }
 
 .expenses-table td {
   padding: 1rem;
   border-bottom: 1px solid #eee;
+  transition: background-color 0.3s ease;
 }
 
 .expenses-table tr:hover {
-  background-color: #f5f5f5;
+  background-color: #f8f9fa;
 }
 
 .expense-amount {
   font-weight: 600;
+  color: #2c3e50;
 }
 
 .type-expense {
   color: #e74c3c;
+  font-weight: 600;
 }
 
 .type-income {
   color: #27ae60;
+  font-weight: 600;
 }
 
 .category-tag {
-  background: #ecf0f1;
+  background: #e9ecef;
   padding: 0.3rem 0.8rem;
   border-radius: 20px;
   font-size: 0.9em;
   display: inline-block;
+  transition: all 0.3s ease;
+}
+
+.category-tag:hover {
+  background: #dee2e6;
+  transform: translateY(-1px);
 }
 
 .action-icons i {
   cursor: pointer;
   margin-right: 0.5rem;
   color: #3498db;
+  transition: all 0.3s ease;
+  padding: 0.5rem;
+  border-radius: 50%;
 }
 
 .action-icons i:hover {
-  color: #1d6fa5;
+  color: #2980b9;
+  background: rgba(52, 152, 219, 0.1);
+  transform: scale(1.1);
 }
 
 .stats-cards {
   display: flex;
   justify-content: space-between;
   margin-bottom: 2rem;
+  gap: 1rem;
 }
 
 .stats-card {
   background: #fff;
   padding: 1.5rem;
   border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
   width: 30%;
   text-align: center;
+  transition: all 0.3s ease;
+}
+
+.stats-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 25px rgba(0,0,0,0.1);
 }
 
 .stats-card i {
   font-size: 2rem;
   color: #3498db;
+  margin-bottom: 1rem;
+  transition: all 0.3s ease;
+}
+
+.stats-card:hover i {
+  transform: scale(1.1);
 }
 
 .pagination-controls {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 1rem;
+  margin-top: 1.5rem;
+  gap: 1rem;
 }
 
 .pagination-btn {
@@ -186,19 +270,53 @@ button:hover {
   padding: 0.7rem 1.5rem;
   border-radius: 8px;
   cursor: pointer;
-  transition: background 0.3s;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .pagination-btn:hover {
   background: #34495e;
-}
-
-#pageInfo {
-  font-size: 1.1rem;
-  margin: 0 1rem;
+  transform: translateY(-2px);
 }
 
 .pagination-btn:disabled {
   background: #bdc3c7;
   cursor: not-allowed;
+  transform: none;
+}
+
+#pageInfo {
+  font-size: 1.1rem;
+  margin: 0 1rem;
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .stats-cards {
+    flex-direction: column;
+  }
+
+  .stats-card {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+
+  form {
+    grid-template-columns: 1fr;
+  }
+
+  .filter-form {
+    flex-direction: column;
+  }
+
+  .chip {
+    width: 100%;
+  }
 }

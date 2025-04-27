@@ -21,21 +21,17 @@ class AuthService(
     private val authenticationManager: AuthenticationManager
 ) {
 
-    val logger = LoggerFactory.getLogger(AuthService::class.java)
+    private val logger = LoggerFactory.getLogger(AuthService::class.java)
 
     fun register(request: RegisterRequest): AuthResponse {
-        logger.info("In register")
         userRepository.save(request.toUser(bCryptPasswordEncoder.encode(request.password)))
-        logger.info("after saving user")
+        logger.info("User saved successfully")
         return AuthResponse(token = jwtService.generateToken(request.email))
     }
 
     fun authenticate(request: LoginRequest): AuthResponse {
-
         val authToken = UsernamePasswordAuthenticationToken(request.email, request.password)
-
         authenticationManager.authenticate(authToken)
-
         return AuthResponse(token = jwtService.generateToken(request.email))
     }
 

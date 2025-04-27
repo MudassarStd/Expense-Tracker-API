@@ -12,13 +12,10 @@ import kotlin.math.log
 @Service
 class JwtService {
 
-    private val secretKey: String = "your-super-secret-key-1234567890-of-all-time"
+    private val secretKey: String = "our-super-secret-key-1234567890-of-all-time"
+    private val logger = LoggerFactory.getLogger(JwtService::class.java)
 
-
-    val logger = LoggerFactory.getLogger(JwtService::class.java)
-
-
-    private val expirationTime: Long = 86400000L
+    private val expirationTime: Long = 86400000L // 24 hours
 
     fun generateToken(userEmail: String): String {
 
@@ -39,11 +36,12 @@ class JwtService {
     fun validateToken(token: String): Boolean {
         try {
             Jwts.parserBuilder()
-                .setSigningKey(Keys.hmacShaKeyFor(secretKey.toByteArray())) // set key
+                .setSigningKey(Keys.hmacShaKeyFor(secretKey.toByteArray()))
                 .build()
                 .parseClaimsJws(token)
             return true
         } catch (e: Exception) {
+            logger.error("Failed to validate token ${e.message}")
             return false
         }
     }
@@ -60,7 +58,7 @@ class JwtService {
                 .parseClaimsJws(token)
                 .body
         } catch (e: Exception) {
-            logger.info("Failed to extract claim, eMessage: ${e.message}")
+            logger.error("Failed to extract claim, eMessage: ${e.message}")
             null
         }
     }

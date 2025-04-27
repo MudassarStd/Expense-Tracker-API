@@ -4,6 +4,7 @@ import com.std.dto.AuthResponse
 import com.std.dto.LoginRequest
 import com.std.dto.RegisterRequest
 import com.std.service.AuthService
+import jakarta.validation.Valid
 import org.slf4j.LoggerFactory
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
@@ -17,17 +18,16 @@ import org.springframework.web.bind.annotation.RestController
 class AuthController(
     private val authService: AuthService
 ) {
-
-    val logger = LoggerFactory.getLogger(AuthController::class.java)
+    private val logger = LoggerFactory.getLogger(AuthController::class.java)
 
     @PostMapping("/register")
-    fun register(@RequestBody registerRequest: RegisterRequest): ResponseEntity<AuthResponse> {
+    fun register(@RequestBody @Valid registerRequest: RegisterRequest): ResponseEntity<AuthResponse> {
         logger.info("Registration request: $registerRequest")
         return ResponseEntity.ok(authService.register(registerRequest))
     }
 
     @PostMapping("login")
-    fun login(@RequestBody loginRequest: LoginRequest): ResponseEntity<AuthResponse> {
+    fun login(@RequestBody @Valid loginRequest: LoginRequest): ResponseEntity<AuthResponse> {
         logger.info("Login request: $loginRequest")
         return ResponseEntity.ok(authService.authenticate(loginRequest))
     }

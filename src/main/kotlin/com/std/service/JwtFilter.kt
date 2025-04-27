@@ -26,12 +26,9 @@ class JwtFilter(
     ) {
 
         val logger = LoggerFactory.getLogger(JwtFilter::class.java)
-
         // get auth header
         val authHeader = request.getHeader("Authorization")
-
         logger.info("Intercepted Request header: $authHeader")
-
 
         // early exit on public routes
 //        val isPublicPath = request.requestURI.startsWith("/auth")
@@ -39,7 +36,6 @@ class JwtFilter(
 //            filterChain.doFilter(request, response)
 //            return
 //        }
-
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")){
             filterChain.doFilter(request, response)
