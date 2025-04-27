@@ -62,11 +62,11 @@ class ExpenseController(private val expenseService: ExpenseService) {
         expenseService.addList(list)
     }
 
-//    @PutMapping("/update/{id}")
-//    fun update(
-//        @PathVariable(required = true) id: Long,
-//        @RequestBody(required = true) expense: Expense
-//    ) = expenseService.update(id, expense)
+    @PutMapping("/update/{id}")
+    fun update(
+        @PathVariable(required = true) id: Long,
+        @RequestBody(required = true) request: ExpenseRequest
+    ) = expenseService.update(id, request)
 
     @DeleteMapping("/delete/{id}")
     fun delete(

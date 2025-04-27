@@ -4,11 +4,13 @@ import com.std.dto.AuthResponse
 import com.std.dto.LoginRequest
 import com.std.dto.RegisterRequest
 import com.std.mapper.toUser
+import com.std.model.User
 import com.std.repository.UserRepository
 import org.slf4j.LoggerFactory
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.AuthenticationServiceException
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 
@@ -35,4 +37,5 @@ class AuthService(
         return AuthResponse(token = jwtService.generateToken(request.email))
     }
 
+    fun getCurrentAuthenticatedUser() = SecurityContextHolder.getContext().authentication as User
 }

@@ -19,22 +19,22 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException::class)
     fun handleResourceNotFoundException(e: ResourceNotFoundException, request: WebRequest): ResponseEntity<Any> {
-        return ResponseEntity(ErrorResponse(message = e.message ?: " Resource Not found", HttpStatus.NOT_FOUND.value()), HttpStatus.NOT_FOUND)
+        return ResponseEntity(Response(message = e.message ?: " Resource Not found", HttpStatus.NOT_FOUND.value()), HttpStatus.NOT_FOUND)
     }
 
     @ExceptionHandler(InvalidRequestException::class)
     fun handleInvalidRequestException(e: InvalidRequestException, request: WebRequest): ResponseEntity<Any> {
-        return ResponseEntity(ErrorResponse(message = e.message ?: "Invalid Request", status = HttpStatus.BAD_REQUEST.value()), HttpStatus.BAD_REQUEST)
+        return ResponseEntity(Response(message = e.message ?: "Invalid Request", status = HttpStatus.BAD_REQUEST.value()), HttpStatus.BAD_REQUEST)
     }
 
     @ExceptionHandler(AuthenticationException::class)
     fun handleAuthException(e: AuthenticationException, request: WebRequest): ResponseEntity<Any> {
-        return ResponseEntity(ErrorResponse(message = e.message ?: "Auth exception", status = HttpStatus.NOT_FOUND.value()), HttpStatus.NOT_FOUND)
+        return ResponseEntity(Response(message = e.message ?: "Auth exception", status = HttpStatus.NOT_FOUND.value()), HttpStatus.NOT_FOUND)
     }
 
     @ExceptionHandler(IllegalArgumentException::class)
     fun handleIllegalArgException(e: AuthenticationException, request: WebRequest): ResponseEntity<Any> {
-        return ResponseEntity(ErrorResponse(message = e.message ?: "Illegal arg exception", status = HttpStatus.BAD_REQUEST.value()), HttpStatus.BAD_REQUEST)
+        return ResponseEntity(Response(message = e.message ?: "Illegal arg exception", status = HttpStatus.BAD_REQUEST.value()), HttpStatus.BAD_REQUEST)
     }
 
     @ExceptionHandler(Exception::class)

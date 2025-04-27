@@ -26,30 +26,32 @@ import java.time.LocalDate
 import kotlin.math.exp
 
 @Service
-class ExpenseService(private val expenseRepository: ExpenseRepository) {
+class ExpenseService(
+    private val expenseRepository: ExpenseRepository,
+    private val authService: AuthService
+) {
 
-    private val logger = LoggerFactory.getLogger(ExpenseService::class.java) // representing KClass, then converting to Java
-    
+    private val logger =
+        LoggerFactory.getLogger(ExpenseService::class.java) // representing KClass, then converting to Java
+
     fun findById(id: Long): ExpenseResponse {
-        val expense = expenseRepository.findById(id).orElseThrow { ResourceNotFoundException("No expense found for id $id") }
-        if (expense.user.id != getCurrentAuthenticatedUser().id) throw ResourceNotFoundException("Access Denied")
+        val expense = expenseRepository.findByIdAndUser(id, authService.getCurrentAuthenticatedUser())
+            ?: throw ResourceNotFoundException("No expense found for id $id")
         return expense.toExpenseResponse()
     }
 
     fun add(expenseRequest: ExpenseRequest) {
         if (expenseRequest.amount <= 0) throw InvalidRequestException("Expense amount cannot be zero or less")
-        expenseRepository.save(expenseRequest.toExpense(getCurrentAuthenticatedUser()))
+        expenseRepository.save(expenseRequest.toExpense(authService.getCurrentAuthenticatedUser()))
     }
 
     fun addList(list: List<ExpenseRequest>) {
         logger.info("Request list size: ${list.size}")
         if (list.isEmpty()) throw InvalidRequestException("List cannot be empty")
-
-        list.forEachIndexed { i, expense->
+        list.forEachIndexed { i, expense ->
             if (expense.amount <= 0) throw InvalidRequestException("Expense amount is zero or less at list index $i")
         }
-
-        val expenses = list.map { it.toExpense(getCurrentAuthenticatedUser()) }
+        val expenses = list.map { it.toExpense(authService.getCurrentAuthenticatedUser()) }
         expenseRepository.saveAll(expenses)
     }
 
@@ -65,16 +67,14 @@ class ExpenseService(private val expenseRepository: ExpenseRepository) {
     ): PaginatedResponse {
 
         val pageRequest = PageRequest.of(page, pageSize)
-        val pageResult: Page<Expense> = expenseRepository.findAll(pageRequest)
+        val pageResult: Page<ExpenseResponse> =
+            expenseRepository.findAllByUser(authService.getCurrentAuthenticatedUser(), pageRequest)
 
         val filteredExpenses = pageResult.content.filter { expense ->
-            (expense.user == getCurrentAuthenticatedUser()) &&
             (minAmount == null || expense.amount >= minAmount) &&
                     (maxAmount == null || expense.amount <= maxAmount) &&
                     (category == null || expense.category == category) &&
                     (type == null || expense.type == type) && (startDate == null || expense.date >= startDate) && (endDate == null || expense.date <= endDate)
-        }.map {
-            it.toExpenseResponse()
         }
 
         return PaginatedResponse(
@@ -83,25 +83,23 @@ class ExpenseService(private val expenseRepository: ExpenseRepository) {
         )
     }
 
-
-    // fix update logic
-
-//    fun update(id: Long, expense: Expense): Expense {
-//        return if (validateUserExpense(id)) {
-//            expenseRepository.save(findById(id).copy(id = id))
-//        } else {
-//            logger.info("Update Id: $id")
-//            throw ResourceNotFoundException("No expense found for id $id")
-//        }
-//    }
+    fun update(id: Long, request: ExpenseRequest): String {
+        expenseRepository.findByIdAndUser(id, authService.getCurrentAuthenticatedUser())?.let{ expense ->
+            expenseRepository.save(expense.copy(
+            amount = request.amount,
+            date = request.date,
+            type = request.type,
+            category = request.category,
+        ))
+        } ?: throw ResourceNotFoundException("No expense found for id $id")
+        return "Updated successfully"
+    }
 
     fun deleteById(id: Long): String {
-        return if (validateUserExpense(id)) {
-            expenseRepository.deleteById(id)
-            "Deleted successfully"
-        } else {
-            throw ResourceNotFoundException("No expense found for id $id")
-        }
+        expenseRepository.findByIdAndUser(id, authService.getCurrentAuthenticatedUser())?.let { expense ->
+            expenseRepository.delete(expense)
+        } ?: throw ResourceNotFoundException("No expense found for id $id")
+        return "Deleted successfully"
     }
 
     fun getTotalAmount(
@@ -109,27 +107,19 @@ class ExpenseService(private val expenseRepository: ExpenseRepository) {
         endDate: LocalDate?
     ): Double {
         logger.info("Date params from request, startDate: $startDate && endDate: $endDate")
-        return expenseRepository.findAll()
-            .filter { (it.user == getCurrentAuthenticatedUser()) && (startDate == null || it.date >= startDate) && (endDate == null || it.date <= endDate) }
+        return expenseRepository.findAllByUser(authService.getCurrentAuthenticatedUser())
+            .filter { ((startDate == null || it.date >= startDate) && (endDate == null || it.date <= endDate)) }
             .sumOf { it.amount }
     }
 
-    fun getTotalAmountByType(type: Type) = expenseRepository.findAll().filter {  it.type == type }.sumOf { it.amount }
+    fun getTotalAmountByType(type: Type) =
+        expenseRepository.findAllByUser(authService.getCurrentAuthenticatedUser()).filter { it.type == type }.sumOf { it.amount }
 
-    fun findSortedByOrder(order: Sort?): List<Expense> {
+    fun findSortedByOrder(order: Sort?): List<ExpenseResponse> {
         return if (order == Sort.ASC || order == null) {
-            expenseRepository.findAll().filter { it.user == getCurrentAuthenticatedUser()  }.sortedBy { it.date }
+            expenseRepository.findAllByUser(authService.getCurrentAuthenticatedUser()).sortedBy { it.date }
         } else {
-            expenseRepository.findAll().filter{ it.user == getCurrentAuthenticatedUser() }. sortedByDescending { it.date }
+            expenseRepository.findAllByUser(authService.getCurrentAuthenticatedUser()).sortedByDescending { it.date }
         }
-    }
-
-    private fun validateUserExpense(eId: Long): Boolean {
-        val expense = expenseRepository.findById(eId).orElseThrow { ResourceNotFoundException("") }
-        return expense.user.id == getCurrentAuthenticatedUser().id
-    }
-
-    private fun getCurrentAuthenticatedUser(): User {
-        return SecurityContextHolder.getContext().authentication.principal as User
     }
 }
