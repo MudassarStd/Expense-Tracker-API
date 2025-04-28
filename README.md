@@ -1,15 +1,22 @@
 # Expense Tracker API
 
-A Simple RESTful API built with Kotlin and Spring Boot for tracking personal expenses. This application provides an efficient way to manage and analyze expenses.
+A Simple RESTful API built with Kotlin and Spring Boot for tracking personal expenses. This application provides an efficient way to manage and analyze expenses with secure authentication.
 
 ## Technologies Used
 
 - Kotlin 1.9.25
 - Spring Boot 3.4.4
 - Spring Data JPA
-- H2 Database
+- Spring Security
+- H2 Database || MySQL
 - Gradle
 - HTML/CSS/JavaScript (Static Frontend to test or playaround)
+
+## Highlighted Features
+- Expenses are secured via JWT based authentication
+- Robust Token validation with JWT filter
+- Pagination
+- Centralized Exception Handling
 
 ## Getting Started
 
@@ -38,15 +45,44 @@ The application will start on `http://localhost:8080`
 
 Once the application is running, you can access the frontend interface by navigating to:
 ```
-http://localhost:8080/index.html
+http://localhost:8080/auth.html
 ```
 
 The frontend provides a user-friendly interface to:
+- Sign up for a new account
+- Sign in to existing account
 - View all expenses
 - Add new expenses
 - Update existing expenses
 - Delete expenses
 - Filter and sort expenses
+
+## Authentication API Endpoints
+
+- `POST /auth/register` - Register a new user
+  - Request Body:
+    ```json
+    {
+      "name": "User Name",
+      "email": "user@example.com",
+      "password": "password"
+    }
+    ```
+- `POST /auth/login` - Login with existing credentials
+  - Request Body:
+    ```json
+    {
+      "email": "user@example.com",
+      "password": "password"
+    }
+    ```
+
+## Response:
+
+Returns a JWT token upon successful registration.
+
+## Authorization 🔒:
+Use the JWT token returned from the /auth/register or /auth/login endpoints for all subsequent API requests.
 
 ## Expense API Endpoints
 
@@ -91,18 +127,18 @@ src/
 │   ├── kotlin/
 │   │   └── com/
 │   │       └── std/
-│   │           ├── controller/    # REST controllers
-│   │           ├── service/       # Business logic
-│   │           ├── model/         # Entity classes
-│   │           ├── repository/    # Data access layer
-│   │           ├── dto/          # Data Transfer Objects
-│   │           ├── mapper/       # Object mappers
-│   │           ├── exception/     # Exception handlers 
+│   │           ├── controller/    
+│   │           ├── service/       
+│   │           ├── model/         
+│   │           ├── repository/    
+│   │           ├── dto/          
+│   │           ├── mapper/       
+│   │           ├── exception/        
+│   │           └── config/security       
 │   ├── resources/
-│   │   ├── static/              # Static files (CSS, JS, images)
-│   │   └── templates/           # HTML templates
-│   └── application.properties   # Application configuration
+│   │   ├── static/              
+│   │   └── templates/           
+│   └── application.properties  
 └── test/
-    └── kotlin/                  # Test classes
+    └── kotlin/                  
 ```
-
